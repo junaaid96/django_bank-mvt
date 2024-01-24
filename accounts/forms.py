@@ -2,29 +2,39 @@
 
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
-from .constants import GENDER_TYPE
+from .constants import ACCOUNT_TYPE, GENDER_TYPE
 from django.contrib.auth.models import User
 from .models import UserBankAccount, UserAddress
 
 
 class UserRegistrationForm(UserCreationForm):
+    # Here the first 3 fields are in built in user model. so we don't need to write them again. but for required=True we have to write them again.
+    first_name = forms.CharField(
+        max_length=50, widget=forms.TextInput(attrs={'required': True}))
+    last_name = forms.CharField(
+        max_length=50, widget=forms.TextInput(attrs={'required': True}))
+    email = forms.EmailField(
+        max_length=100, widget=forms.TextInput(attrs={'required': True}))
+
+    account_type = forms.ChoiceField(choices=ACCOUNT_TYPE)
     birth_date = forms.DateField(
-        null=True, blank=True, widget=forms.DateInput(attrs={'type': 'date'}))
-    gender = forms.CharField(max_length=10, choices=GENDER_TYPE)
+        widget=forms.DateInput(attrs={'type': 'date'}))
+    gender = forms.ChoiceField(choices=GENDER_TYPE)
     street_address = forms.CharField(max_length=100)
-    city = forms.CharField(max_length=50)
+    city = forms.CharField(max_length=100)
     postal_code = forms.IntegerField()
+    country = forms.CharField(max_length=100)
 
     class Meta:
         model = User
-        fields = ['username', 'first_name', 'last_name', 'email', 'account_type',
+        fields = ['username', 'first_name', 'last_name', 'email', 'password1', 'password2', 'account_type',
                   'gender', 'birth_date', 'street_address', 'city', 'postal_code', 'country']
 
     def save(self, commit=True):
         customer = super().save(commit=False)
         if commit == True:
             customer.save()  # we save data to user model
-            
+
             account_type = self.cleaned_data.get('account_type')
             gender = self.cleaned_data.get('gender')
             birth_date = self.cleaned_data.get('birth_date')
