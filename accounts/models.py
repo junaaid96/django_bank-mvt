@@ -26,8 +26,8 @@ class UserAddress(models.Model):
         User, related_name='address', on_delete=models.CASCADE)
     street_address = models.CharField(max_length=100)
     city = models.CharField(max_length=50)
-    state = models.CharField(max_length=50)
     postal_code = models.IntegerField()
+    country = models.CharField(max_length=50)
     
     def __str__(self):
         return f"{self.user.username} - {self.street_address} - {self.city} - {self.postal_code}"
