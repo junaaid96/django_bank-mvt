@@ -1,9 +1,9 @@
 from django.shortcuts import render
 from django.urls import reverse_lazy
+from django.contrib import messages
 from django.views.generic import FormView
 from .forms import UserRegistrationForm
 from django.contrib.auth import login
-
 
 
 class UserRegistrationView(FormView):
@@ -15,6 +15,7 @@ class UserRegistrationView(FormView):
 
     def form_valid(self, form):
         customer = form.save()
+        messages.success(self.request, 'Account Created Successfully!')
         login(self.request, customer)
         # here we use super() to call the parent class method form_valid() and pass the form as an argument. that means form_valid calls itself recursively.
         return super().form_valid(form)

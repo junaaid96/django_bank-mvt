@@ -10,6 +10,18 @@
 </head>
 
 <body>
+    <!-- Showing Messages -->
+    {% if messages %}
+    {% for message in messages %}
+    <h4 class="text-gray-50 w-9/12 p-3 m-auto text-center rounded-xl mt-2 
+        {% if message.tags == 'error' %}bg-red-400
+        {% elif message.tags == 'warning' %}bg-yellow-400
+        {% else %}bg-green-400
+        {% endif %}">{{message}}
+    </h4>
+    {% endfor %}
+    {% endif %}
+
     {% if form.non_field_errors %}
     {% for error in form.non_field_errors %}
     <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-2" role="alert">
