@@ -61,9 +61,11 @@ class UserRegistrationForm(UserCreationForm):
 
             return customer
 
+    # Here we use the init method to add a class attribute to all fields for styling. We can also use the django-widget-tweaks package to add or modify HTML attributes and CSS classes of the fields in the template. The init method is a special method that is automatically invoked when an object is created from a class. It allows the class to initialize the attributes of the object. That means it sets the initial state of the object that is created from the class.
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        # here add class to all fields for styling
         for field in self.fields:
             # self.fields[field].widget.attrs['required'] = True
             self.fields[field].widget.attrs.update({
