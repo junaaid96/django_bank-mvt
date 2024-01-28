@@ -1,9 +1,10 @@
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.contrib import messages
+from django.views import View
 from django.views.generic import FormView
 from django.contrib.auth.views import LoginView, LogoutView
-from .forms import UserRegistrationForm
+from .forms import UserRegistrationForm, UserUpdateForm
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
@@ -38,3 +39,21 @@ class UserLogout(LogoutView):
     def get_success_url(self):
         logout(self.request)
         return reverse_lazy('login')
+
+class UserBankAccountUpdate(View):
+    template_name = 'accounts/profile.html'
+
+    def get(self, request):
+        form = UserUpdateForm(instance=request.user)
+        return render(request, self.template_name, {'form': form})
+
+    def post(self, request):
+        form = UserUpdateForm(request.POST, instance=request.user)
+        if form.is_valid():
+            print("ddd")
+            form.save()
+            messages.success(request, 'Account Updated Successfully!')
+            return redirect('profile')
+        else:
+            print("Invalid")
+        return render(request, self.template_name, {'form': form})
