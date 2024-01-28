@@ -40,6 +40,7 @@ class UserLogout(LogoutView):
         logout(self.request)
         return reverse_lazy('login')
 
+
 class UserBankAccountUpdate(View):
     template_name = 'accounts/profile.html'
 
@@ -50,10 +51,9 @@ class UserBankAccountUpdate(View):
     def post(self, request):
         form = UserUpdateForm(request.POST, instance=request.user)
         if form.is_valid():
-            print("ddd")
             form.save()
             messages.success(request, 'Account Updated Successfully!')
             return redirect('profile')
         else:
-            print("Invalid")
+            print(form.errors)
         return render(request, self.template_name, {'form': form})
