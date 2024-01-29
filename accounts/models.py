@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from .constants import ACCOUNT_TYPE, GENDER_TYPE
+from django_bank.constants import ACCOUNT_TYPE, GENDER_TYPE
 
 # Create your models here.
 
@@ -28,7 +28,6 @@ class UserAddress(models.Model):
     city = models.CharField(max_length=50)
     postal_code = models.IntegerField()
     country = models.CharField(max_length=50)
-    
+
     def __str__(self):
         return f"{self.user.username} - {self.street_address} - {self.city} - {self.country}"
-    

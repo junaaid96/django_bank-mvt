@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'core',
     'accounts',
+    'transactions',
 ]
 
 # LOGIN_REDIRECT_URL = 'home'

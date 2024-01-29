@@ -9,3 +9,11 @@ GENDER_TYPE = (
     ('Male', 'Male'),
     ('Female', 'Female'),
 )
+
+TRANSACTION_TYPE = (
+    ('Deposit', 'Deposit'),
+    ('Withdraw', 'Withdraw'),
+    ('Transfer', 'Transfer'),
+    ('Loan', 'Loan'),
+    ('Repayment', 'Repayment'),
+)
