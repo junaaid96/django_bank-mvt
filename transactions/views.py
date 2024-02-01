@@ -1,12 +1,14 @@
-from typing import Any
-from django.shortcuts import render
-from django.views.generic import CreateView
+from django.views.generic import CreateView, ListView
+from django.views import View
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Transaction
 from .forms import DepositForm, WithdrawForm, LoanRequestForm
 from django.contrib import messages
 from django.http import HttpResponse
+from datetime import datetime
+from django.db.models import Sum
+from django.shortcuts import get_object_or_404, redirect
 
 # Create your views here.
 
@@ -105,3 +107,80 @@ class LoanRequest(CreateTransactionView):
             self.request, f'You have successfully requested ${amount} loan and awaiting for admin approval')
 
         return super().form_valid(form)
+
+
+class TransactionReport(LoginRequiredMixin, ListView):
+    template_name = ''
+    model = Transaction
+    balance = 0
+
+    def get_queryset(self):
+        # by default all transactions will be shown
+        queryset = super().get_queryset().filter(
+            account=self.request.user.account)
+
+        start_date = self.request.GET.get('start_date')
+        end_date = self.request.GET.get('end_date')
+
+        if start_date and end_date:
+            # converting string to date
+            start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+            end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+            # transactions will be filtered based on the date range
+            # queryset = queryset.filter(
+            #     transaction_date__date__range=[start_date, end_date])
+            queryset = queryset.filter(
+                transaction_date__date_gte=start_date, transaction_date__date_lte=end_date)
+
+            # calculating the filtered transactions balance
+            self.balance = Transaction.objects.filter(transaction_date__date_gte=start_date, transaction_date__date_lte=end_date).aggregate(
+                # amount__sum is the key of the dictionary returned by aggregate method. we can also use balance=Sum('amount') but then we have to use balance.balance to access the balance in the template. so we use amount__sum (Note: comment will be updated later!)
+                balance=Sum('amount'))['amount__sum']
+        else:
+            # by default calculating the balance of all transactions
+            self.balance = self.request.user.account.balance
+
+        # return queryset
+        return queryset.distinct()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'account': self.request.user.account,
+        })
+        return context
+
+
+class Repayment(LoginRequiredMixin, View):
+    def get(self, request, loan_id):
+        loan = get_object_or_404(Transaction, id=loan_id)
+        if loan.loan_approved:
+            customer = loan.account
+            if loan.amount < customer.balance:
+                customer.balance -= loan.amount
+                loan.balance_after_transaction = customer.balance
+                customer.save()
+                loan.transaction_type = 'Repayment'
+                loan.save()
+
+                messages.success(
+                    request, f'You have successfully repaid ${loan.amount}')
+
+                return redirect('transaction_report')
+            else:
+                messages.error(
+                    request, f'You have insufficient balance to repay ${loan.amount}')
+
+                return redirect('transaction_report')
+
+
+class LoanList(LoginRequiredMixin, ListView):
+    template_name = ''
+    model = Transaction
+    context_object_name = 'loans'
+
+    def get_queryset(self):
+        customer = self.request.user.account
+        queryset = Transaction.objects.filter(
+            account=customer, transaction_type='Loan')
+        return queryset
