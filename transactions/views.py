@@ -16,10 +16,10 @@ from django.shortcuts import get_object_or_404, redirect
 
 
 class CreateTransactionView(LoginRequiredMixin, CreateView):
-    template_name = ''
+    template_name = 'transaction_form.html'
     model = Transaction
     title = ''
-    success_url = reverse_lazy('')
+    success_url = reverse_lazy('transaction-report')
 
     # passing the account object to the form. get_form_kwargs method is often used to pass additional parameters to a form when it is instantiated. This can be useful for dynamically customizing the behavior of a form based on the context of the view.
     def get_form_kwargs(self):
@@ -83,6 +83,10 @@ class WithdrawMoney(CreateTransactionView):
         return super().form_valid(form)
 
 
+class TransferMoney(CreateTransactionView):
+    pass
+
+
 class LoanRequest(CreateTransactionView):
     form_class = LoanRequestForm
     title = 'Loan Request'
@@ -110,7 +114,7 @@ class LoanRequest(CreateTransactionView):
 
 
 class TransactionReport(LoginRequiredMixin, ListView):
-    template_name = ''
+    template_name = 'transaction_report.html'
     model = Transaction
     balance = 0
 
@@ -130,12 +134,12 @@ class TransactionReport(LoginRequiredMixin, ListView):
             # queryset = queryset.filter(
             #     transaction_date__date__range=[start_date, end_date])
             queryset = queryset.filter(
-                transaction_date__date_gte=start_date, transaction_date__date_lte=end_date)
+                transaction_date__gte=start_date, transaction_date__lte=end_date)
 
             # calculating the filtered transactions balance
-            self.balance = Transaction.objects.filter(transaction_date__date_gte=start_date, transaction_date__date_lte=end_date).aggregate(
+            self.balance = Transaction.objects.filter(transaction_date__gte=start_date, transaction_date__lte=end_date).aggregate(
                 # amount__sum is the key of the dictionary returned by aggregate method. we can also use balance=Sum('amount') but then we have to use balance.balance to access the balance in the template. so we use amount__sum (Note: comment will be updated later!)
-                balance=Sum('amount'))['amount__sum']
+                Sum('amount'))['amount__sum']
         else:
             # by default calculating the balance of all transactions
             self.balance = self.request.user.account.balance
@@ -151,7 +155,7 @@ class TransactionReport(LoginRequiredMixin, ListView):
         return context
 
 
-class Repayment(LoginRequiredMixin, View):
+class LoanRepayment(LoginRequiredMixin, View):
     def get(self, request, loan_id):
         loan = get_object_or_404(Transaction, id=loan_id)
         if loan.loan_approved:

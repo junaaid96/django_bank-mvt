@@ -42,7 +42,7 @@ class WithdrawForm(TransactionForm):
         balance = account.balance
         min_withdraw = 500
         max_withdraw = 50000
-        amount = self.cleaned_dat.get('amount')
+        amount = self.cleaned_data.get('amount')
         if amount < min_withdraw:
             raise forms.ValidationError(
                 f"Minimum withdraw amount is ${min_withdraw}")

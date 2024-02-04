@@ -23,4 +23,5 @@ urlpatterns = [
     path('', HomePageView.as_view(), name='home'),
     # path('accounts/', include(('accounts.urls', 'accounts'), namespace='accounts')),
     path('accounts/', include('accounts.urls')),
+    path('transactions/', include('transactions.urls')),
 ]
