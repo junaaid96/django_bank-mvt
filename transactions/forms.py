@@ -1,5 +1,7 @@
 from django import forms
 from .models import Transaction
+from decimal import Decimal
+from django.template.defaultfilters import floatformat
 
 
 class TransactionForm(forms.ModelForm):
@@ -31,10 +33,6 @@ class DepositForm(TransactionForm):
                 f"Minimum deposit amount is ${min_deposit}")
         return amount
 
-    # def save(self, commit=True):
-    #     self.instance.transaction_type = 'Deposit'
-    #     return super().save()
-
 
 class WithdrawForm(TransactionForm):
     def clean_amount(self):
@@ -59,12 +57,13 @@ class LoanRequestForm(TransactionForm):
     def clean_amount(self):
         account = self.account
         balance = account.balance
-        min_loan = balance * 0.1
-        max_loan = balance * 0.5
+        min_loan = balance * Decimal('0.1')  # Convert float to Decimal
+        max_loan = balance * Decimal('0.5')
         amount = self.cleaned_data.get('amount')
         if amount < min_loan:
             raise forms.ValidationError(
-                f"You have to take minimum ${min_loan} loan")
+                f"You have to take minimum ${floatformat(min_loan, 2)} loan")
         if amount > max_loan:
             raise forms.ValidationError(
-                f"You can take maximum ${max_loan} loan")
+                f"You can take maximum ${floatformat(max_loan, 2)} loan")
+        return amount

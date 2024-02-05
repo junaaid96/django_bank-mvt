@@ -14,7 +14,7 @@ class Transaction(models.Model):
         max_digits=12, decimal_places=2)
     transaction_type = models.CharField(
         max_length=20, choices=TRANSACTION_TYPE, null=True, blank=True)
-    transaction_date = models.DateTimeField(auto_now_add=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
     loan_approved = models.BooleanField(default=False)
     loan_repayment = models.BooleanField(default=False)
 
@@ -22,4 +22,4 @@ class Transaction(models.Model):
         return f"{self.account.account_no} - {self.transaction_type} - {self.amount}"
 
     class Meta:
-        ordering = ['-transaction_date']
+        ordering = ['-timestamp']

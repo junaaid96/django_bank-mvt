@@ -44,12 +44,12 @@
       {% for transaction in object_list %}
       <tr class="border-b dark:border-neutral-500">
         <td class="px-4 py-2">
-          {{ transaction.transaction_date|date:"F d, Y h:i A" }}
+          {{ transaction.timestamp|date:"F d, Y h:i A" }}
         </td>
         <td class="px-4 py-3 text-s border">
           <span
-            class="px-2 py-1 font-bold leading-tight rounded-sm {% if transaction.get_transaction_type_display == 'Withdraw' %} text-red-700 bg-red-100 {% else %} text-green-700 bg-green-100 {% endif %}">
-            {{ transaction.get_transaction_type_display }}
+            class="px-2 py-1 font-bold leading-tight rounded-sm {% if transaction.transaction_type == 'Withdraw' %} text-red-700 bg-red-100 {% else %} text-green-700 bg-green-100 {% endif %}">
+            {{ transaction.transaction_type }}
           </span>
         </td>
         <td class="px-4 py-2">

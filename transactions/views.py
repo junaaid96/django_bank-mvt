@@ -97,14 +97,10 @@ class LoanRequest(CreateTransactionView):
 
     def form_valid(self, form):
         amount = form.cleaned_data.get('amount')
-        loan_request_count = Transaction.objects.filter(
-            account=self.request.user.account, transaction_type='Loan Request').count()
-        loan_approved_count = Transaction.objects.filter(
+        loan_count = Transaction.objects.filter(
             account=self.request.user.account, transaction_type='Loan').count()
 
-        if loan_request_count > 0:
-            return HttpResponse('You already have a loan request')
-        if loan_approved_count >= 3:
+        if loan_count >= 3:
             return HttpResponse('You have reached the maximum limit of loan request')
 
         messages.success(
@@ -134,18 +130,18 @@ class TransactionReport(LoginRequiredMixin, ListView):
             # queryset = queryset.filter(
             #     transaction_date__date__range=[start_date, end_date])
             queryset = queryset.filter(
-                transaction_date__gte=start_date, transaction_date__lte=end_date)
+                timestamp__date__gte=start_date, timestamp__date__lte=end_date)
 
             # calculating the filtered transactions balance
-            self.balance = Transaction.objects.filter(transaction_date__gte=start_date, transaction_date__lte=end_date).aggregate(
+            self.balance = Transaction.objects.filter(timestamp__date__gte=start_date, timestamp__date__lte=end_date).aggregate(
                 # amount__sum is the key of the dictionary returned by aggregate method. we can also use balance=Sum('amount') but then we have to use balance.balance to access the balance in the template. so we use amount__sum (Note: comment will be updated later!)
                 Sum('amount'))['amount__sum']
         else:
             # by default calculating the balance of all transactions
             self.balance = self.request.user.account.balance
 
-        # return queryset
-        return queryset.distinct()
+        # return queryset.distinct()
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
