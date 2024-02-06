@@ -41,14 +41,13 @@
       </tr>
     </thead>
     <tbody>
-      {% for transaction in object_list %}
+      {% for transaction in transactions %}
       <tr class="border-b dark:border-neutral-500">
         <td class="px-4 py-2">
           {{ transaction.timestamp|date:"F d, Y h:i A" }}
         </td>
         <td class="px-4 py-3 text-s border">
-          <span
-            class="px-2 py-1 font-bold leading-tight rounded-sm {% if transaction.transaction_type == 'Withdraw' %} text-red-700 bg-red-100 {% else %} text-green-700 bg-green-100 {% endif %}">
+          <span class="px-2 py-1 font-bold leading-tight rounded-sm {{ transaction.css_classes }}">
             {{ transaction.transaction_type }}
           </span>
         </td>

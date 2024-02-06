@@ -21,5 +21,15 @@ class Transaction(models.Model):
     def __str__(self):
         return f"{self.account.account_no} - {self.transaction_type} - {self.amount}"
 
+    @property
+    def css_classes(self):
+        css_classes = {
+            'Withdraw': 'text-red-700 bg-red-100',
+            'Deposit': 'text-green-700 bg-green-100',
+            'Loan': 'text-green-700 bg-green-100' if self.loan_approved else 'text-yellow-700 bg-yellow-100',
+            'Repayment': 'text-red-700 bg-red-100'
+        }
+        return css_classes.get(self.transaction_type, '')
+
     class Meta:
         ordering = ['-timestamp']

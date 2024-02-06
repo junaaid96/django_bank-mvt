@@ -15,7 +15,7 @@ class UserRegistration(FormView):
     form_class = UserRegistrationForm
     # reverse_lazy is used to delay the reverse lookup until the view is called.
     # reverse_lazy is used in class based views and object, reverse is used in function based views and string.
-    success_url = reverse_lazy('register')
+    success_url = reverse_lazy('profile')
 
     def form_valid(self, form):
         customer = form.save()

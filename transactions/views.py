@@ -98,7 +98,7 @@ class LoanRequest(CreateTransactionView):
     def form_valid(self, form):
         amount = form.cleaned_data.get('amount')
         loan_count = Transaction.objects.filter(
-            account=self.request.user.account, transaction_type='Loan').count()
+            account=self.request.user.account, transaction_type='Loan', loan_repayment=False).count()
 
         if loan_count >= 3:
             return HttpResponse('You have reached the maximum limit of loan request')
@@ -113,6 +113,8 @@ class TransactionReport(LoginRequiredMixin, ListView):
     template_name = 'transaction_report.html'
     model = Transaction
     balance = 0
+    # if i didn't use context_object_name, then i have to use object_list in the template.
+    context_object_name = 'transactions'
 
     def get_queryset(self):
         # by default all transactions will be shown
@@ -156,31 +158,42 @@ class LoanRepayment(LoginRequiredMixin, View):
         loan = get_object_or_404(Transaction, id=loan_id)
         if loan.loan_approved:
             customer = loan.account
-            if loan.amount < customer.balance:
+            if loan.amount <= customer.balance:
                 customer.balance -= loan.amount
                 loan.balance_after_transaction = customer.balance
                 customer.save()
-                loan.transaction_type = 'Repayment'
+                # loan.transaction_type = 'Repayment'
+                # loan.save()
+                loan.loan_repayment = True
                 loan.save()
+
+                # creating the new repayment transaction instead of updating the loan transaction
+                Transaction.objects.create(
+                    account=loan.account,
+                    amount=loan.amount,
+                    balance_after_transaction=customer.balance,
+                    transaction_type='Repayment'
+                )
 
                 messages.success(
                     request, f'You have successfully repaid ${loan.amount}')
 
-                return redirect('transaction_report')
+                return redirect('transaction-report')
             else:
                 messages.error(
                     request, f'You have insufficient balance to repay ${loan.amount}')
 
-                return redirect('transaction_report')
+                return redirect('transaction-report')
 
 
 class LoanList(LoginRequiredMixin, ListView):
-    template_name = ''
+    template_name = 'loan_request.html'
     model = Transaction
     context_object_name = 'loans'
 
     def get_queryset(self):
         customer = self.request.user.account
-        queryset = Transaction.objects.filter(
+        loan_queryset = Transaction.objects.filter(
             account=customer, transaction_type='Loan')
-        return queryset
+
+        return loan_queryset
