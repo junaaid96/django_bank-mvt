@@ -160,10 +160,9 @@ class LoanRepayment(LoginRequiredMixin, View):
             customer = loan.account
             if loan.amount <= customer.balance:
                 customer.balance -= loan.amount
-                loan.balance_after_transaction = customer.balance
+                # loan.balance_after_transaction = customer.balance (this line is not needed because we are creating new transaction instead of updating the loan transaction)
                 customer.save()
-                # loan.transaction_type = 'Repayment'
-                # loan.save()
+                # loan.transaction_type = 'Repayment' (also not needed because we are creating new transaction instead of updating the loan transaction)
                 loan.loan_repayment = True
                 loan.save()
 
