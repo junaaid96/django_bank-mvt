@@ -1,9 +1,9 @@
 {% load humanize %}
 
-<p>Hello {{user.first_name}} {{user.last_name}},</p>
+<p>Hello <strong>{{user.first_name}} {{user.last_name}}</strong>,</p>
 
 <p>
-    We have approved your loan request of
+    Congratulations! We have approved your loan request of
     <strong>${{amount|floatformat:2|intcomma}}</strong>.
 </p>
 
