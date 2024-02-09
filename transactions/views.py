@@ -9,14 +9,26 @@ from django.http import HttpResponse
 from datetime import datetime
 from django.db.models import Sum
 from django.shortcuts import get_object_or_404, redirect
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
 
 # Create your views here.
 
 # we will inherit this view for all transaction such as deposit, withdrawal, transfer, loan request, etc.
 
 
+def send_transaction_email(user, email, amount, mail_subject, html_template):
+    message = render_to_string(html_template, {
+        'user': user,
+        'amount': amount
+    })
+    send_email = EmailMultiAlternatives(mail_subject, '', to=[email])
+    send_email.attach_alternative(message, "text/html")
+    send_email.send()
+
+
 class CreateTransactionView(LoginRequiredMixin, CreateView):
-    template_name = 'transaction_form.html'
+    template_name = 'transactions/transaction_form.html'
     model = Transaction
     title = ''
     success_url = reverse_lazy('transaction-report')
@@ -58,6 +70,10 @@ class DepositMoney(CreateTransactionView):
         messages.success(
             self.request, f'You have successfully deposited ${amount}')
 
+        send_transaction_email(
+            self.request.user, self.request.user.email, amount, 'Deposit Confirmation', 'email/deposit_email.html'
+        )
+
         return super().form_valid(form)
 
 
@@ -79,6 +95,10 @@ class WithdrawMoney(CreateTransactionView):
 
         messages.success(
             self.request, f'You have successfully withdrawn ${amount}')
+
+        send_transaction_email(
+            self.request.user, self.request.user.email, amount, 'Withdrawal Confirmation', 'email/withdraw_email.html'
+        )
 
         return super().form_valid(form)
 
@@ -105,12 +125,16 @@ class LoanRequest(CreateTransactionView):
 
         messages.success(
             self.request, f'You have successfully requested ${amount} loan and awaiting for admin approval')
+        
+        send_transaction_email(
+            self.request.user, self.request.user.email, amount, 'Loan Request', 'email/loan_request_email.html'
+        )
 
         return super().form_valid(form)
 
 
 class TransactionReport(LoginRequiredMixin, ListView):
-    template_name = 'transaction_report.html'
+    template_name = 'transactions/transaction_report.html'
     model = Transaction
     balance = 0
     # if i didn't use context_object_name, then i have to use object_list in the template.
@@ -176,6 +200,10 @@ class LoanRepayment(LoginRequiredMixin, View):
 
                 messages.success(
                     request, f'You have successfully repaid ${loan.amount}')
+                
+                send_transaction_email(
+                    request.user, request.user.email, loan.amount, 'Loan Repayment Confirmation', 'email/loan_repayment_email.html'
+                )
 
                 return redirect('transaction-report')
             else:
@@ -186,7 +214,7 @@ class LoanRepayment(LoginRequiredMixin, View):
 
 
 class LoanList(LoginRequiredMixin, ListView):
-    template_name = 'loan_request.html'
+    template_name = 'transactions/loan_lists.html'
     model = Transaction
     context_object_name = 'loans'
 
