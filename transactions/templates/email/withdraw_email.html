@@ -3,9 +3,13 @@
 <p>Hello {{user.first_name}} {{user.last_name}},</p>
 
 <p>
-    You have successfully withdrawn <strong>${{amount|floatformat:2|intcomma}}</strong> from your
-    account.
+    You have successfully withdrawn
+    <strong>${{amount|floatformat:2|intcomma}}</strong> from your account.
 </p>
-<p>Your new balance is <strong>${{user.account.balance|floatformat:2|intcomma}}</strong>.</p>
+
+<p>
+    Your new balance is
+    <strong>${{user.account.balance|floatformat:2|intcomma}}</strong>.
+</p>
 
 <p>Thank you for using our service.<br /><strong>Django Bank Ltd.</strong></p>

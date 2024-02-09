@@ -1,0 +1,15 @@
+{% load humanize %}
+
+<p>Hello {{user.first_name}} {{user.last_name}},</p>
+
+<p>
+    We have received your loan request of
+    <strong>${{amount|floatformat:2|intcomma}}</strong>.
+</p>
+
+<p>
+    Your loan request is being processed. You will receive an email once your
+    loan request has been approved.
+</p>
+
+<p>Thank you for using our service.<br /><strong>Django Bank Ltd.</strong></p>

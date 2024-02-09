@@ -1,4 +1,5 @@
 from django.contrib import admin
+from transactions.views import send_transaction_email
 from .models import Transaction
 
 # Register your models here.
@@ -22,6 +23,9 @@ class TransactionAdmin(admin.ModelAdmin):
             if obj.loan_approved:
                 obj.account.balance += obj.amount
                 obj.balance_after_transaction += obj.amount
+                send_transaction_email(
+                    obj.account.user, obj.account.user.email, obj.amount, 'Loan Approval', 'email/loan_approved_email.html'
+                )
             else:
                 raise ValueError('Loan transaction is not approved.')
         elif obj.transaction_type == 'Repayment':
