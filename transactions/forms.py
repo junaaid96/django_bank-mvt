@@ -1,7 +1,6 @@
 from django import forms
 from .models import Transaction
 from decimal import Decimal
-from django.template.defaultfilters import floatformat
 
 
 class TransactionForm(forms.ModelForm):
@@ -27,10 +26,10 @@ class TransactionForm(forms.ModelForm):
 class DepositForm(TransactionForm):
     def clean_amount(self):
         amount = self.cleaned_data['amount']
-        min_deposit = 100
+        min_deposit = 1000
         if amount < min_deposit:
             raise forms.ValidationError(
-                f"Minimum deposit amount is ${min_deposit}")
+                f"Minimum deposit amount is ${min_deposit:,.2f}")
         return amount
 
 
@@ -38,18 +37,18 @@ class WithdrawForm(TransactionForm):
     def clean_amount(self):
         account = self.account
         balance = account.balance
-        min_withdraw = 500
-        max_withdraw = 50000
+        min_withdraw = 1000
+        max_withdraw = 5000000
         amount = self.cleaned_data.get('amount')
         if amount < min_withdraw:
             raise forms.ValidationError(
-                f"Minimum withdraw amount is ${min_withdraw}")
+                f"Minimum withdraw amount is ${min_withdraw:,.2f}")
         if amount > max_withdraw:
             raise forms.ValidationError(
-                f"Maximum withdraw amount is ${max_withdraw}")
+                f"Maximum withdraw amount is ${max_withdraw:,.2f}")
         if amount > balance:
             raise forms.ValidationError(
-                f"Insufficient balance. Your balance is ${balance}")
+                f"Insufficient balance. Your balance is ${balance:,.2f}")
         return amount
 
 
@@ -62,8 +61,8 @@ class LoanRequestForm(TransactionForm):
         amount = self.cleaned_data.get('amount')
         if amount < min_loan:
             raise forms.ValidationError(
-                f"You have to take minimum ${floatformat(min_loan, 2)} loan")
+                f"You have to take minimum ${min_loan:,.2f} loan")
         if amount > max_loan:
             raise forms.ValidationError(
-                f"You can take maximum ${floatformat(max_loan, 2)} loan")
+                f"You can take maximum ${max_loan:,.2f} loan")
         return amount

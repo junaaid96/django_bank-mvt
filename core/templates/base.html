@@ -14,18 +14,15 @@
     {% include 'navbar.html' %}
 
     <!-- Showing Messages -->
-    {% if messages %}
-    {% for message in messages %}
-    <h4 class="text-gray-50 w-9/12 p-3 m-auto text-center mt-2 rounded-xl 
-        {% if message.tags == 'error' %}bg-red-500
-        {% elif message.tags == 'warning' %}bg-yellow-500
-        {% else %}bg-green-500
-        {% endif %}">{{message}}
-    </h4>
-    {% endfor %}
-    {% endif %}
+    <div class="w-2/4 m-auto">
+        {% include 'messages.html' %}
+    </div>
 
+    <!-- Content -->
     {% block content %} {% endblock %}
+
+    <!-- Footer -->
+    <!-- will be added later -->
 </body>
 
 </html>
