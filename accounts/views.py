@@ -32,7 +32,6 @@ class UserLogin(LoginView):
         return reverse_lazy('home')
 
 
-@method_decorator(login_required, name='dispatch')
 class UserLogout(LogoutView):
     template_name = ''
 

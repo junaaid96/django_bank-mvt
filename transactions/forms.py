@@ -26,10 +26,14 @@ class TransactionForm(forms.ModelForm):
 class DepositForm(TransactionForm):
     def clean_amount(self):
         amount = self.cleaned_data['amount']
-        min_deposit = 1000
+        min_deposit = 100
+        max_deposit = 500000
         if amount < min_deposit:
             raise forms.ValidationError(
                 f"Minimum deposit amount is ${min_deposit:,.2f}")
+        if amount > max_deposit:
+            raise forms.ValidationError(
+                f"Maximum deposit amount is ${max_deposit:,.2f}")
         return amount
 
 
@@ -37,8 +41,8 @@ class WithdrawForm(TransactionForm):
     def clean_amount(self):
         account = self.account
         balance = account.balance
-        min_withdraw = 1000
-        max_withdraw = 5000000
+        min_withdraw = 100
+        max_withdraw = 100000
         amount = self.cleaned_data.get('amount')
         if amount < min_withdraw:
             raise forms.ValidationError(
