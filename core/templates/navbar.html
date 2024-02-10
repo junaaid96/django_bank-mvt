@@ -40,9 +40,12 @@
                 ${{request.user.account.balance|floatformat:2|intcomma}})</div>
             <a href="{% url 'profile' %}"
                 class="mx-2 inline-block font-medium text-sm px-4 py-2 leading-none bg-blue-500 rounded text-white border-white hover:border-transparent hover:text-dark hover:bg-blue-800 mt-4 lg:mt-0">Profile</a>
-            <a href="{% url 'logout' %}"
-                class="mx-2 inline-block font-medium text-sm px-4 py-2 leading-none bg-blue-500 rounded text-white border-white hover:border-transparent hover:text-dark hover:bg-blue-800 mt-4 lg:mt-0">Logout
-                {% csrf_token %}</a>
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button
+                    class="mx-2 inline-block font-medium text-sm px-4 py-2 leading-none bg-blue-500 rounded text-white border-white hover:border-transparent hover:text-dark hover:bg-blue-800 mt-4 lg:mt-0"
+                    type="submit">Logout</button>
+            </form>
         </div>
         {% else %}
         <div class="text-md lg:flex-grow"></div>

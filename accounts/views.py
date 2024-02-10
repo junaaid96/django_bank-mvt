@@ -39,7 +39,7 @@ class UserLogout(LogoutView):
         logout(self.request)
         return reverse_lazy('login')
 
-
+@method_decorator(login_required, name='dispatch')
 class UserBankAccountUpdate(View):
     template_name = 'accounts/profile.html'
 
