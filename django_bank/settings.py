@@ -164,3 +164,6 @@ EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASS')
 
 # CSRF settings
 CSRF_TRUSTED_ORIGINS = ['https://django-bank-oezi.onrender.com']
+
+SESSION_COOKIE_SECURE = True
+
