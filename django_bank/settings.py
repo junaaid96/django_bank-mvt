@@ -94,6 +94,7 @@ WSGI_APPLICATION = 'django_bank.wsgi.application'
 # }
 
 # PostgreSQL
+# local
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql',
@@ -105,6 +106,7 @@ WSGI_APPLICATION = 'django_bank.wsgi.application'
 #     }
 # }
 
+# render.com
 DATABASES = {
     'default': dj_database_url.config(
         default='postgres://junaaid96:wyHzFpcwyGqj8qOlp2hjdOPJG7uoBGDg@dpg-cn3fsfq1hbls73ackaf0-a.oregon-postgres.render.com/djangobankdb',

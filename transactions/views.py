@@ -11,7 +11,6 @@ from django.db.models import Sum
 from django.shortcuts import get_object_or_404, redirect
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
-
 # Create your views here.
 
 # we will inherit this view for all transaction such as deposit, withdrawal, transfer, loan request, etc.
@@ -68,7 +67,7 @@ class DepositMoney(CreateTransactionView):
         )
 
         messages.success(
-            self.request, f'You have successfully deposited ${amount}')
+            self.request, f'You have successfully deposited ${amount:,.2f}')
 
         send_transaction_email(
             self.request.user, self.request.user.email, amount, 'Deposit Confirmation', 'email/deposit_email.html'
@@ -94,7 +93,7 @@ class WithdrawMoney(CreateTransactionView):
         )
 
         messages.success(
-            self.request, f'You have successfully withdrawn ${amount}')
+            self.request, f'You have successfully withdrawn ${amount:,.2f}')
 
         send_transaction_email(
             self.request.user, self.request.user.email, amount, 'Withdrawal Confirmation', 'email/withdraw_email.html'
@@ -124,7 +123,7 @@ class LoanRequest(CreateTransactionView):
             return HttpResponse('You have reached the maximum limit of loan request')
 
         messages.success(
-            self.request, f'You have successfully requested ${amount} loan and awaiting for admin approval')
+            self.request, f'You have successfully requested ${amount:,.2f} loan and awaiting for admin approval')
         
         send_transaction_email(
             self.request.user, self.request.user.email, amount, 'Loan Request', 'email/loan_request_email.html'
@@ -199,7 +198,7 @@ class LoanRepayment(LoginRequiredMixin, View):
                 )
 
                 messages.success(
-                    request, f'You have successfully repaid ${loan.amount}')
+                    request, f'You have successfully repaid ${loan.amount:,.2f}')
                 
                 send_transaction_email(
                     request.user, request.user.email, loan.amount, 'Loan Repayment Confirmation', 'email/loan_repayment_email.html'
@@ -208,7 +207,7 @@ class LoanRepayment(LoginRequiredMixin, View):
                 return redirect('transaction-report')
             else:
                 messages.error(
-                    request, f'You have insufficient balance to repay ${loan.amount}')
+                    request, f'You have insufficient balance to repay ${loan.amount:,.2f}')
 
                 return redirect('transaction-report')
 
