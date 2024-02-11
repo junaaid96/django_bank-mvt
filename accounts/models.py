@@ -6,6 +6,7 @@ from django_bank.constants import ACCOUNT_TYPE, GENDER_TYPE
 
 
 class UserBankAccount(models.Model):
+    # models.Model is a class from django.db.models. it is the base class for all models in django. it provides some methods and attributes to interact with the database.
     # django has built in user model. now i create my own user model with other fields and make a OneToOne relationship with the built in user model. i use related_name to access built in user model from my user model. on_delete=models.CASCADE means if the built in user model is deleted, my user model will also be deleted.
 
     user = models.OneToOneField(
