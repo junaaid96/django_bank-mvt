@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %} 
+{% load static %}
 {% block title %}Customer Profile{% endblock %}
 
 {% block content %}
@@ -16,6 +16,7 @@
 <div class="bg-white px-3 py-4 rounded-xl my-6">
     <h4 class="font-bold text-2xl text-left pb-5">Account No: {{request.user.account.account_no}}</h4>
     <h1 class="font-bold text-3xl text-center pb-5">Update Profile Information</h1>
+    
     <div class="w-full mt-10">
         <form method="post" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
             {% csrf_token %}
@@ -162,6 +163,9 @@
                 </button>
             </div>
         </form>
+        <a href="{% url 'change_password' %}"
+            class="bg-blue-500 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Change
+            Password</a>
     </div>
 </div>
 {% endblock %}

@@ -9,4 +9,5 @@ urlpatterns = [
     path('profile/', views.UserBankAccountUpdate.as_view(), name='profile'),
     path('logout/', views.UserLogout.as_view(), name='logout'),
     # path('logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
+    path('profile/password_change/', views.UserPasswordChange.as_view(), name='change_password'),
 ]

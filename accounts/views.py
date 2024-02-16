@@ -8,6 +8,8 @@ from .forms import UserRegistrationForm, UserUpdateForm
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
+from django.contrib.auth.views import PasswordChangeView
+from django.contrib.auth.forms import PasswordChangeForm
 
 
 class UserRegistration(FormView):
@@ -39,6 +41,7 @@ class UserLogout(LogoutView):
         logout(self.request)
         return reverse_lazy('login')
 
+
 @method_decorator(login_required, name='dispatch')
 class UserBankAccountUpdate(View):
     template_name = 'accounts/profile.html'
@@ -56,3 +59,18 @@ class UserBankAccountUpdate(View):
         else:
             print(form.errors)
         return render(request, self.template_name, {'form': form})
+
+
+@method_decorator(login_required, name='dispatch')
+class UserPasswordChange(PasswordChangeView):
+    template_name = 'accounts/change_password.html'
+    form_class = PasswordChangeForm
+    success_url = reverse_lazy('profile')
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Password Changed Successfully!')
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, 'Password Change Failed!')
+        return super().form_invalid(form)

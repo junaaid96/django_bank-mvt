@@ -54,11 +54,14 @@ class TransferForm(TransactionForm):
 
     def clean_receiver_account_no(self):
         receiver_account_no = self.cleaned_data.get('receiver_account_no')
+        if receiver_account_no == self.account.account_no:
+            raise forms.ValidationError(
+                "You can't transfer to your own account!")
         try:
             receiver_account = UserBankAccount.objects.get(
                 account_no=receiver_account_no)
         except UserBankAccount.DoesNotExist:
-            raise forms.ValidationError("Invalid account number!")
+            raise forms.ValidationError("Account doesn't Exist!")
         return receiver_account
 
 
@@ -68,6 +71,7 @@ class WithdrawForm(TransactionForm):
         balance = account.balance
         min_withdraw = 100
         max_withdraw = 100000
+        required_balance = 500
         amount = self.cleaned_data.get('amount')
         if amount < min_withdraw:
             raise forms.ValidationError(
@@ -75,6 +79,9 @@ class WithdrawForm(TransactionForm):
         if amount > max_withdraw:
             raise forms.ValidationError(
                 f"Maximum withdraw amount is ${max_withdraw:,.2f}")
+        if balance - amount < required_balance:
+            raise forms.ValidationError(
+                f"Our bank is in bankruptcy situation. You can't withdraw this amount.")
         if amount > balance:
             raise forms.ValidationError(
                 f"Insufficient balance. Your balance is ${balance:,.2f}")
