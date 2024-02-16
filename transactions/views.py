@@ -138,6 +138,13 @@ class TransferMoney(CreateView):
             update_fields=['balance']
         )
 
+        Transaction.objects.create(
+            account=receiver_account,
+            amount=amount,
+            balance_after_transaction=receiver_account.balance,
+            transaction_type='Receive'
+        )
+
         messages.success(
             self.request, f'You have successfully transferred ${amount:,.2f} to {receiver_account.user.username}')
 

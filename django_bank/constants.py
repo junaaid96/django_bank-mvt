@@ -12,6 +12,7 @@ GENDER_TYPE = (
 
 TRANSACTION_TYPE = (
     ('Deposit', 'Deposit'),
+    ('Receive', 'Receive'),
     ('Withdraw', 'Withdraw'),
     ('Transfer', 'Transfer'),
     ('Loan', 'Loan'),
