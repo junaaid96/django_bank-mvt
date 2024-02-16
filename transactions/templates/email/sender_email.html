@@ -1,0 +1,13 @@
+{% load humanize %}
+
+<p>Hello <strong>{{user.first_name}} {{user.last_name}}</strong>,</p>
+
+<p>
+    You have successfully send <strong>${{amount|floatformat:2|intcomma}}</strong> to <strong>{{receiver.user.first_name}} {{receiver.user.last_name}} (Account No: {{receiver.account_no}})</strong>.
+</p>
+
+<p>
+    Your new balance is <strong>${{user.account.balance|floatformat:2|intcomma}}</strong>.
+</p>
+
+<p>Thank you for using our service.<br /><strong>Django Bank Ltd.</strong></p>

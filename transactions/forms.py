@@ -1,6 +1,7 @@
 from django import forms
 from .models import Transaction
 from decimal import Decimal
+from accounts.models import UserBankAccount
 
 
 class TransactionForm(forms.ModelForm):
@@ -35,6 +36,30 @@ class DepositForm(TransactionForm):
             raise forms.ValidationError(
                 f"Maximum deposit amount is ${max_deposit:,.2f}")
         return amount
+
+
+class TransferForm(TransactionForm):
+    receiver_account_no = forms.IntegerField()
+
+    def clean_amount(self):
+        account = self.account
+        balance = account.balance
+        amount = self.cleaned_data.get('amount')
+        if amount < 50:
+            raise forms.ValidationError("Minimum transfer amount is $50")
+        if amount > balance:
+            raise forms.ValidationError(
+                f"Insufficient balance. Your balance is ${balance:,.2f}")
+        return amount
+
+    def clean_receiver_account_no(self):
+        receiver_account_no = self.cleaned_data.get('receiver_account_no')
+        try:
+            receiver_account = UserBankAccount.objects.get(
+                account_no=receiver_account_no)
+        except UserBankAccount.DoesNotExist:
+            raise forms.ValidationError("Invalid account number!")
+        return receiver_account
 
 
 class WithdrawForm(TransactionForm):

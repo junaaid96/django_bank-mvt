@@ -24,8 +24,9 @@ class Transaction(models.Model):
     @property
     def css_classes(self):
         css_classes = {
-            'Withdraw': 'text-red-700 bg-red-100',
             'Deposit': 'text-green-700 bg-green-100',
+            'Transfer': 'text-red-700 bg-red-100',
+            'Withdraw': 'text-red-700 bg-red-100',
             'Loan': 'text-green-700 bg-green-100' if self.loan_approved else 'text-yellow-700 bg-yellow-100',
             'Repayment': 'text-red-700 bg-red-100'
         }

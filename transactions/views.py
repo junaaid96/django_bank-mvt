@@ -3,7 +3,7 @@ from django.views import View
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Transaction
-from .forms import DepositForm, WithdrawForm, LoanRequestForm
+from .forms import DepositForm, TransferForm, WithdrawForm, LoanRequestForm
 from django.contrib import messages
 from django.http import HttpResponse
 from datetime import datetime
@@ -16,9 +16,10 @@ from django.template.loader import render_to_string
 # we will inherit this view for all transaction such as deposit, withdrawal, transfer, loan request, etc.
 
 
-def send_transaction_email(user, email, amount, mail_subject, html_template):
+def send_transaction_email(user, receiver, email, amount, mail_subject, html_template):
     message = render_to_string(html_template, {
         'user': user,
+        'receiver': receiver,
         'amount': amount
     })
     send_email = EmailMultiAlternatives(mail_subject, '', to=[email])
@@ -70,7 +71,7 @@ class DepositMoney(CreateTransactionView):
             self.request, f'You have successfully deposited ${amount:,.2f}')
 
         send_transaction_email(
-            self.request.user, self.request.user.email, amount, 'Deposit Confirmation', 'email/deposit_email.html'
+            self.request.user, None, self.request.user.email, amount, 'Deposit Confirmation', 'email/deposit_email.html'
         )
 
         return super().form_valid(form)
@@ -96,14 +97,59 @@ class WithdrawMoney(CreateTransactionView):
             self.request, f'You have successfully withdrawn ${amount:,.2f}')
 
         send_transaction_email(
-            self.request.user, self.request.user.email, amount, 'Withdrawal Confirmation', 'email/withdraw_email.html'
+            self.request.user, None, self.request.user.email, amount, 'Withdrawal Confirmation', 'email/withdraw_email.html'
         )
 
         return super().form_valid(form)
 
 
-class TransferMoney(CreateTransactionView):
-    pass
+class TransferMoney(CreateView):
+    form_class = TransferForm
+    template_name = 'transactions/transaction_form.html'
+    success_url = reverse_lazy('transaction-report')
+    title = 'Transfer Money'
+
+    def get_initial(self):
+        initial = {'transaction_type': 'Transfer'}
+        return initial
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['account'] = self.request.user.account
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = self.title
+        return context
+
+    def form_valid(self, form):
+        sender_account = self.request.user.account
+        receiver_account = form.cleaned_data.get('receiver_account_no')
+        amount = form.cleaned_data.get('amount')
+
+        sender_account.balance -= amount
+        sender_account.save(
+            update_fields=['balance']
+        )
+
+        receiver_account.balance += amount
+        receiver_account.save(
+            update_fields=['balance']
+        )
+
+        messages.success(
+            self.request, f'You have successfully transferred ${amount:,.2f} to {receiver_account.user.username}')
+
+        send_transaction_email(
+            self.request.user, receiver_account, self.request.user.email, amount, 'Transfer Confirmation', 'email/sender_email.html'
+        )
+
+        send_transaction_email(
+            self.request.user, receiver_account, receiver_account.user.email, amount, 'Transfer Confirmation', 'email/receiver_email.html'
+        )
+
+        return super().form_valid(form)
 
 
 class LoanRequest(CreateTransactionView):
@@ -124,9 +170,9 @@ class LoanRequest(CreateTransactionView):
 
         messages.success(
             self.request, f'You have successfully requested ${amount:,.2f} loan and awaiting for admin approval')
-        
+
         send_transaction_email(
-            self.request.user, self.request.user.email, amount, 'Loan Request', 'email/loan_request_email.html'
+            self.request.user, None, self.request.user.email, amount, 'Loan Request', 'email/loan_request_email.html'
         )
 
         return super().form_valid(form)
@@ -199,9 +245,9 @@ class LoanRepayment(LoginRequiredMixin, View):
 
                 messages.success(
                     request, f'You have successfully repaid ${loan.amount:,.2f}')
-                
+
                 send_transaction_email(
-                    request.user, request.user.email, loan.amount, 'Loan Repayment Confirmation', 'email/loan_repayment_email.html'
+                    request.user, None, request.user.email, loan.amount, 'Loan Repayment Confirmation', 'email/loan_repayment_email.html'
                 )
 
                 return redirect('transaction-report')
