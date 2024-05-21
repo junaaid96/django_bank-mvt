@@ -87,12 +87,12 @@ WSGI_APPLICATION = 'django_bank.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 # sqlite3
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
 
 # PostgreSQL
 # local
@@ -108,11 +108,11 @@ WSGI_APPLICATION = 'django_bank.wsgi.application'
 # }
 
 # render.com
-DATABASES = {
-    'default': dj_database_url.config(
-        default='postgres://junaaid96:wyHzFpcwyGqj8qOlp2hjdOPJG7uoBGDg@dpg-cn3fsfq1hbls73ackaf0-a.oregon-postgres.render.com/djangobankdb',
-    )
-}
+# DATABASES = {
+#     'default': dj_database_url.config(
+#         default='postgres://junaaid96:wyHzFpcwyGqj8qOlp2hjdOPJG7uoBGDg@dpg-cn3fsfq1hbls73ackaf0-a.oregon-postgres.render.com/djangobankdb',
+#     )
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
